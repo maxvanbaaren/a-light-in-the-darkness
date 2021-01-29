@@ -1,0 +1,32 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://retiles.tres" type="TileSet" id=2]
+[ext_resource path="res://Door.tscn" type="PackedScene" id=3]
+[ext_resource path="res://CanvasModulate.tscn" type="PackedScene" id=4]
+[ext_resource path="res://background.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Key.tscn" type="PackedScene" id=6]
+
+[node name="L1" type="Node2D"]
+
+[node name="Door" parent="." instance=ExtResource( 3 )]
+position = Vector2( 512, 275 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 120, 272 )
+
+[node name="TileMap" type="TileMap" parent="."]
+scale = Vector2( 2, 2 )
+tile_set = ExtResource( 2 )
+cell_size = Vector2( 16, 16 )
+format = 1
+tile_data = PoolIntArray( 0, 536870917, 0, 31, 5, 0, 65536, 536870917, 0, 65567, 5, 0, 131072, 536870917, 0, 131103, 5, 0, 196608, 536870917, 0, 196639, 5, 0, 262144, 536870917, 0, 262175, 5, 0, 327680, 536870917, 0, 327711, 5, 0, 393216, 536870917, 0, 393247, 5, 0, 458752, 536870917, 0, 458783, 5, 0, 524288, 536870917, 0, 524319, 5, 0, 589824, 536870917, 0, 589855, 5, 0, 655360, 536870915, 0, 655361, 1, 0, 655362, 1, 0, 655363, 1, 0, 655364, 1, 0, 655365, 1, 0, 655366, 1, 0, 655367, 1, 0, 655368, 1, 0, 655369, 1, 0, 655370, 1, 0, 655371, 1, 0, 655372, 1, 0, 655373, 1, 0, 655374, 1, 0, 655375, 1, 0, 655376, 1, 0, 655377, 1, 0, 655378, 1, 0, 655379, 1, 0, 655380, 1, 0, 655381, 1, 0, 655382, 1, 0, 655383, 1, 0, 655384, 1, 0, 655385, 1, 0, 655386, 1, 0, 655387, 1, 0, 655388, 1, 0, 655389, 1, 0, 655390, 1, 0, 655391, 3, 0 )
+
+[node name="background" parent="." instance=ExtResource( 5 )]
+visible = true
+
+[node name="CanvasModulate" parent="." instance=ExtResource( 4 )]
+visible = true
+
+[node name="Key" parent="." instance=ExtResource( 6 )]
+position = Vector2( 904, 296 )

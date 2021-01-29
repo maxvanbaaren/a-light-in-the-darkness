@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/beyond2.wav-dd2f2a338b6bd356ee4a061cacf6c304.sample"
+
+[deps]
+
+source_file="res://sounds/beyond2.wav"
+dest_files=[ "res://.import/beyond2.wav-dd2f2a338b6bd356ee4a061cacf6c304.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0
