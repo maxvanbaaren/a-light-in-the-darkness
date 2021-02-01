@@ -10,8 +10,9 @@ var numLight = 3 #number of light sources
 var velocity : Vector2 = Vector2() 
 var curAnim = "idle" #current animation 
 
-onready var sprite : Sprite = get_node("Sprite")
-onready var anim : AnimationPlayer = get_node("AnimationPlayer")
+#node variables 
+onready var sprite = get_node("Sprite")
+onready var anim = get_node("AnimationPlayer")
 onready var hud = get_node("/root/Hud").get_node("CanvasLayer")
 onready var doorBox = get_node("DoorBox")
 onready var timer = get_node("distantMonsterTimer")
@@ -96,7 +97,7 @@ func AnimationChange(new_anim):
 		anim.play(new_anim)
 		curAnim = new_anim
 
-#updates angle to throw lightsource 
+#updates angle to throw light
 func update_directional_force():
 	directional_force = Vector2(cos(light_angle*(PI/180)), sin(light_angle*(PI/180))) * light_speed
 
@@ -113,7 +114,7 @@ func _ready():
 	hud.get_node("Sprite2").visible = true;
 	hud.get_node("Sprite3").visible = true;
 
-#throw light source if one hasn't just been thrown 
+#throw light if one hasn't just been thrown 
 func _process(delta):
 	if(throwing and waited > throw_delay):
 		ThrowOnce()
@@ -121,7 +122,7 @@ func _process(delta):
 	elif(waited <= throw_delay):
 		waited += delta
 
-#update hud 
+#update hud, throw one light 
 func ThrowOnce():
 	ThrowLight()
 	throwing = false
@@ -133,7 +134,7 @@ func ThrowOnce():
 	elif(numLight==0):
 		hud.get_node("Sprite").visible = false;
 
-#spawn light source and toss it 
+#spawn light and throw it 
 func ThrowLight():
 	var thrownlight = light_scene.instance()
 	thrownlight.set_global_position(lightsourcespawn.get_global_position())
@@ -147,14 +148,20 @@ func _on_KeyBox_area_entered(_area):
 #screen goes dark on death, death sound played 
 func _on_KillBox_area_entered(_area):
 	if isDead == false:
+		
 		isDead = true
+		
+		#hud invisible 
 		hud.get_node("Sprite").visible = false;
 		hud.get_node("Sprite2").visible = false;
 		hud.get_node("Sprite3").visible = false;
+		
+		#player invisible 
 		get_node("Light2D").enabled = false
 		get_node("Sprite").visible = false
+		
 		get_node("DeathSound").play()
-		deathTimer.set_wait_time(5)
+		deathTimer.set_wait_time(5) #time until restart 
 		deathTimer.start()
 
 #background sound 
