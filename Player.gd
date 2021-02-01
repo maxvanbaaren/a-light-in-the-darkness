@@ -1,18 +1,23 @@
 extends KinematicBody2D
 
-var score : int = 0
-var speed : int = 200
-var jumpForce : int = 400
-var isjumping = false
-var isfalling = false
-var gravity : int = 1000
+var isJumping = false
+var isFalling = false
+var isDead = false 
+var speed = 200 #movement speed 
+var jumpForce = 400 #jump height
+var gravity = 1000 #force of gravity on player 
+var numLight = 3 #number of light sources 
 var velocity : Vector2 = Vector2() 
+var curAnim = "idle" #current animation 
+
 onready var sprite : Sprite = get_node("Sprite")
 onready var anim : AnimationPlayer = get_node("AnimationPlayer")
-var cur_anim = "idle"
-var numlight = 3
-var isdead = false
-
+onready var hud = get_node("/root/Hud").get_node("CanvasLayer")
+onready var doorBox = get_node("DoorBox")
+onready var timer = get_node("distantMonsterTimer")
+onready var deathTimer = get_node("DeathTimer")
+ 
+#lightsource variables 
 var throwing = false
 export (int) var light_gravity = 5
 export (int) var light_speed = 5
@@ -20,19 +25,12 @@ export (float) var light_angle = 330
 export (float) var throw_delay = 1
 var waited = 0
 var directional_force = Vector2()
-#lightsource scene
-export (PackedScene) var light_scene 
-#lightsourcespawn
-export (NodePath) var lightsourcespawn_path
+export (PackedScene) var light_scene #lightsource scene
+export (NodePath) var lightsourcespawn_path #lightsourcespawn
 onready var lightsourcespawn = get_node(lightsourcespawn_path)
 
-onready var hud = get_node("/root/Hud").get_node("CanvasLayer")
-onready var doorbox = get_node("DoorBox")
-onready var timer = get_node("distantMonsterTimer")
-onready var death_timer = get_node("DeathTimer")
-
-
 func _physics_process(delta):
+	
 	velocity.x = 0
 	
 	#movement inputs
@@ -40,30 +38,31 @@ func _physics_process(delta):
 		velocity.x -= speed
 	if Input.is_action_pressed("move_right"):
 		velocity.x += speed
-		
+	
 	#apply velocity
 	velocity = move_and_slide(velocity, Vector2.UP)
 	
-	#gravity
+	#apply gravity
 	velocity.y += gravity * delta
 	
 	#jump input
-	#is_action_just_pressed for not continuous jumping
-	if Input.is_action_pressed("jump") and is_on_floor() and isdead == false: 
+	if Input.is_action_pressed("jump") and is_on_floor() and isDead == false: 
 		velocity.y -= jumpForce
-		isjumping = true
+		isJumping = true
+		
 		#jump sound effect
 		var jump_sound = $"JumpSound"
 		jump_sound.play()
+		
 	#landing sound effect/animation 
-	if is_on_floor() and isfalling == true:
+	if is_on_floor() and isFalling == true:
 		var land_sound = $"LandSound"
 		land_sound.play()
-		isfalling = false
+		isFalling = false
 		AnimationChange("land")
 	if velocity.y>0 and !is_on_floor():
-		isfalling = true
-		isjumping = false
+		isFalling = true
+		isJumping = false
 		
 	#sprite direction
 	if velocity.x < 0:
@@ -83,19 +82,21 @@ func _physics_process(delta):
 			AnimationChange("idle")
 		elif velocity.x != 0:  
 			AnimationChange("running") 
+		
 	#throw light
 	if Input.is_action_pressed("throwlight"):
-		if numlight > 0:
+		if numLight > 0:
 			throwing = true
 	elif Input.is_action_just_released("throwlight"):
 		throwing = false
 
 #changes animation 
 func AnimationChange(new_anim):
-	if new_anim != cur_anim:
+	if new_anim != curAnim:
 		anim.play(new_anim)
-		cur_anim = new_anim
+		curAnim = new_anim
 
+#updates angle to throw lightsource 
 func update_directional_force():
 	directional_force = Vector2(cos(light_angle*(PI/180)), sin(light_angle*(PI/180))) * light_speed
 
@@ -105,7 +106,8 @@ func _ready():
 	music.play() #background music 
 	timer.set_wait_time(15) #background noise timer
 	timer.start()
-	doorbox.get_node("CollisionShape2D").disabled = true #won't unlock door unless you have key
+	doorBox.get_node("CollisionShape2D").disabled = true #won't unlock door unless you have key
+	
 	#hud visible 
 	hud.get_node("Sprite").visible = true;
 	hud.get_node("Sprite2").visible = true;
@@ -123,12 +125,12 @@ func _process(delta):
 func ThrowOnce():
 	ThrowLight()
 	throwing = false
-	numlight-=1
-	if(numlight==2):
+	numLight-=1
+	if(numLight==2):
 		hud.get_node("Sprite2").visible = false;
-	elif(numlight==1):
+	elif(numLight==1):
 		hud.get_node("Sprite3").visible = false;
-	elif(numlight==0):
+	elif(numLight==0):
 		hud.get_node("Sprite").visible = false;
 
 #spawn light source and toss it 
@@ -140,20 +142,20 @@ func ThrowLight():
 
 #door unlocked 
 func _on_KeyBox_area_entered(_area):
-	doorbox.get_node("CollisionShape2D").set_deferred("disabled", false)
+	doorBox.get_node("CollisionShape2D").set_deferred("disabled", false)
 
 #screen goes dark on death, death sound played 
 func _on_KillBox_area_entered(_area):
-	if isdead == false:
-		isdead = true
+	if isDead == false:
+		isDead = true
 		hud.get_node("Sprite").visible = false;
 		hud.get_node("Sprite2").visible = false;
 		hud.get_node("Sprite3").visible = false;
 		get_node("Light2D").enabled = false
 		get_node("Sprite").visible = false
 		get_node("DeathSound").play()
-		death_timer.set_wait_time(5)
-		death_timer.start()
+		deathTimer.set_wait_time(5)
+		deathTimer.start()
 
 #background sound 
 func _on_distantMonsterTimer_timeout():
